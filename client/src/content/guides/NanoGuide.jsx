@@ -209,7 +209,7 @@ const NanoGuide = () => (
         </GuidePrompt>
 
         <GuideFrame borderless>
-          <GuideImage className="w-full" src={nanoModel} alt="Fashion model in tailored brown dress on cherry red backdrop — editorial style" aspectRatio="1 / 1" />
+          <GuideImage className="w-full guide-image-bg-black" src={nanoModel} alt="Fashion model in tailored brown dress on cherry red backdrop — editorial style" aspectRatio="1 / 1" />
         </GuideFrame>
       </GuideTab>
 
@@ -327,7 +327,7 @@ const NanoGuide = () => (
     </GuidePrompt>
 
     <GuideFrame borderless>
-      <GuideImage className="w-full" src={californiaWeather} alt="City-in-a-cup smartphone UI — weather-reactive visualization" aspectRatio="1 / 1" />
+      <GuideImage className="w-full guide-image-bg-black" src={californiaWeather} alt="City-in-a-cup smartphone UI — weather-reactive visualization" aspectRatio="1 / 1" />
     </GuideFrame>
 
     <GuideCallout variant="info">
@@ -377,7 +377,7 @@ const NanoGuide = () => (
         <GuidePrompt description='A typographic poster with a solid black background, bold letters spell "New York", filling the center of the frame. The text acts as a cut-out window. A photograph of New York skyline is visible ONLY inside the letterforms.' />
 
         <GuideFrame caption="Typographic poster: New York skyline through letterforms" borderless>
-          <GuideImage className="w-full" src={newYork} alt="New York typographic poster — skyline through letterforms" aspectRatio="1 / 1" />
+          <GuideImage className="w-full guide-image-bg-black" src={newYork} alt="New York typographic poster — skyline through letterforms" aspectRatio="1 / 1" />
         </GuideFrame>
       </GuideTab>
     </GuideTabs>

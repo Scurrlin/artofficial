@@ -179,3 +179,7 @@ textarea:-webkit-autofill {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+
+.guide-image-bg-black {
+  background-color: #000;
+}

@@ -35,12 +35,12 @@ describe('Card', () => {
     expect(screen.getByText('Alice')).toBeInTheDocument();
   });
 
-  it('renders SClogo fallback with "Image not found" text when photo is missing', () => {
+  it('renders branded fallback with "Image not found" text when photo is missing', () => {
     render(<Card {...defaultProps} photo="" />);
 
-    const fallback = screen.getByTestId('card-fallback');
-    expect(fallback).toHaveAttribute('src', '/SClogo.png');
-    expect(fallback).toHaveAttribute('alt', 'Image not found');
+    const fallback = screen.getByRole('img', { name: 'Image not found' });
+    expect(fallback).toHaveAttribute('data-testid', 'card-fallback');
+    expect(fallback.getAttribute('style')).toContain('/brand-logos/openAI.svg');
     expect(screen.getByText('Image not found')).toBeInTheDocument();
   });
 
