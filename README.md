@@ -1,5 +1,5 @@
 # Art/official
-A full MERN stack [AI image generator](https://www.artofficial.fun/) powered by cutting edge models from OpenAI, Google, and Black Forest Labs.
+A full MERN stack [AI image generator](https://www.artofficial.fun/) featuring cutting edge models from OpenAI, Google, and Black Forest Labs.
 
 ![banner_image](/client/public/Artofficial_thumbnail-min.png)
 
