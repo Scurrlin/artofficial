@@ -4,6 +4,7 @@ export const IMAGE_MODELS = [
     label: 'DALL-E 3',
     generatable: false,
     iconLogo: '/brand-logos/openAI.svg',
+    statIconClass: 'w-12 h-12',
   },
   {
     id: 'gpt-image-1.5',
@@ -13,6 +14,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Choose what to change and what to keep between drafts to prevent iterative drift',
     textLogo: '/brand-logos/OpenAI-text.svg',
     iconLogo: '/brand-logos/openAI.svg',
+    statIconClass: 'w-12 h-12',
   },
   {
     id: 'nano-banana-2',
@@ -22,6 +24,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Utilize creative director controls for specific lighting, camera, and lens settings',
     textLogo: '/brand-logos/Google.svg',
     iconLogo: '/brand-logos/whiteG.svg',
+    statIconClass: 'w-9 h-9',
   },
   {
     id: 'flux-2',
@@ -31,6 +34,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Use hex codes for colors, quotes for text, and JSON for complex scenes',
     textLogo: '/brand-logos/BFL.svg',
     iconLogo: '/brand-logos/black-forest-labs.svg',
+    statIconClass: 'w-11 h-11',
   },
 ];
 

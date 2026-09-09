@@ -165,6 +165,7 @@ const Home = ({ stats, selectedModel, onRefreshStats }) => {
               imageCount={stats.imageCount}
               userCount={stats.userCount}
               iconLogo={currentModel.iconLogo}
+              iconClassName={currentModel.statIconClass}
               onRefresh={handleRefresh}
               refreshing={refreshing}
             />

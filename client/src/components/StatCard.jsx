@@ -1,13 +1,13 @@
 import React from 'react';
 
-const StatCard = ({ imageCount, userCount, iconLogo, onRefresh, refreshing = false }) => {
+const StatCard = ({ imageCount, userCount, iconLogo, iconClassName = 'w-12 h-12', onRefresh, refreshing = false }) => {
   return (
     <div className="relative w-full max-w-[380px] md:min-w-[380px] md:max-w-[450px] overflow-hidden rounded-2xl bg-[#10131f] shadow-[0_12px_40px_rgba(0,0,0,0.06)] grid grid-cols-[1fr_auto_1fr] items-center gap-y-1 px-6 py-5">
       <div className="text-4xl font-semibold tracking-tight text-white tabular-nums text-center">
         {userCount.toLocaleString()}
       </div>
 
-      <img src={iconLogo} alt="" className="w-12 h-12 shrink-0 justify-self-center" aria-hidden="true" />
+      <img src={iconLogo} alt="" className={`${iconClassName} shrink-0 justify-self-center`} aria-hidden="true" />
 
       <div className="text-4xl font-semibold tracking-tight text-white tabular-nums text-center">
         {imageCount.toLocaleString()}
