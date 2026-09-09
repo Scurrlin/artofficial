@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Home from '../Home';
 
@@ -21,7 +21,16 @@ vi.mock('../../components', () => ({
       />
     </div>
   ),
-  StatCard: () => null,
+  StatCard: ({ onRefresh, refreshing }) => (
+    <button
+      type="button"
+      aria-label="Refresh feed"
+      onClick={onRefresh}
+      disabled={refreshing}
+    >
+      Refresh
+    </button>
+  ),
 }));
 
 vi.mock('../../components/Loader', () => ({
@@ -82,5 +91,41 @@ describe('Home', () => {
     });
 
     expect(screen.getByAltText('A valid prompt')).toBeInTheDocument();
+  });
+
+  it('refetches posts when the refresh button is clicked', async () => {
+    const onRefreshStats = vi.fn();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ data: mockPosts }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: [
+              ...mockPosts,
+              { _id: '3', name: 'Cara', prompt: 'A new image', photo: 'https://example.com/three.jpg' },
+            ],
+          }),
+      });
+
+    render(
+      <Home
+        stats={{ imageCount: 2, userCount: 2 }}
+        onRefreshStats={onRefreshStats}
+      />
+    );
+
+    expect(await screen.findByAltText('A sunset over mountains')).toBeInTheDocument();
+    expect(screen.getAllByTestId('card')).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: /refresh feed/i }));
+
+    expect(await screen.findByAltText('A new image')).toBeInTheDocument();
+    expect(screen.getAllByTestId('card')).toHaveLength(3);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(onRefreshStats).toHaveBeenCalledTimes(1);
   });
 });

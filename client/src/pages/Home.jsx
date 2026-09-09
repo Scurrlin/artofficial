@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Card, FormField, StatCard } from '../components';
 import { IMAGE_MODELS } from '../constants';
 
@@ -15,6 +15,23 @@ const FALLBACK_PREVIEW_POST = {
   modelId: 'gpt-image-1.5',
 };
 
+const filterPosts = (posts, query) => {
+  const trimmedQuery = query.trim();
+  if (trimmedQuery === '') return null;
+  if (trimmedQuery === FALLBACK_PREVIEW_TRIGGER) return [FALLBACK_PREVIEW_POST];
+
+  return (posts || []).filter((item) => {
+    const modelEntry = IMAGE_MODELS.find((m) => m.id === item.modelId);
+    const modelLabel = modelEntry?.label?.toLowerCase() || '';
+    return (
+      (item.name || '').toLowerCase().includes(trimmedQuery) ||
+      (item.prompt || '').toLowerCase().includes(trimmedQuery) ||
+      (item.modelId || '').toLowerCase().includes(trimmedQuery) ||
+      modelLabel.includes(trimmedQuery)
+    );
+  });
+};
+
 const RenderCards = ({ data, title }) => {
   if (data?.length > 0) {
     return data.map((post, index) => (
@@ -27,9 +44,10 @@ const RenderCards = ({ data, title }) => {
   );
 };
 
-const Home = ({ stats, selectedModel }) => {
+const Home = ({ stats, selectedModel, onRefreshStats }) => {
   const currentModel = IMAGE_MODELS.find((m) => m.id === selectedModel) || IMAGE_MODELS[0];
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [allPosts, setAllPosts] = useState(null);
 
   const [showLoader, setShowLoader] = useState(false);
@@ -37,6 +55,8 @@ const Home = ({ stats, selectedModel }) => {
   const [searchText, setSearchText] = useState('');
   const [searchedResults, setSearchedResults] = useState(null);
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const searchTextRef = useRef(searchText);
+  searchTextRef.current = searchText;
 
   useEffect(() => {
     if (loading) {
@@ -46,51 +66,71 @@ const Home = ({ stats, selectedModel }) => {
     setShowLoader(false);
   }, [loading]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const loadPosts = useCallback(async ({ isRefresh = false } = {}) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
       setLoading(true);
+    }
 
-      try {
+    try {
+      let result;
+
+      if (!isRefresh) {
         const prefetched = window.__PREFETCH_POSTS__;
-        let result;
-
         if (prefetched) {
           window.__PREFETCH_POSTS__ = null;
           result = await prefetched;
         }
+      }
 
-        if (!result) {
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/post`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
+      if (!result) {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/post`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
 
-          if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-          }
-
-          result = await response.json();
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        setAllPosts(result.data);
-      } catch (err) {
-        console.error('Error fetching posts:', err.message);
-      } finally {
+        result = await response.json();
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const posts = result.data;
+      setAllPosts(posts);
+
+      if (isRefresh) {
+        setSearchedResults(filterPosts(posts, searchTextRef.current));
+      }
+    } catch (err) {
+      console.error('Error fetching posts:', err.message);
+    } finally {
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
         setLoading(false);
       }
-    };
+    }
+  }, []);
 
-    fetchPosts();
+  useEffect(() => {
+    loadPosts();
 
-    // Cleanup timeout on unmount
     return () => {
       if (searchTimeout) {
         clearTimeout(searchTimeout);
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadPosts]);
+
+  const handleRefresh = () => {
+    if (loading || refreshing) return;
+    loadPosts({ isRefresh: true });
+    onRefreshStats?.();
+  };
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
@@ -101,28 +141,7 @@ const Home = ({ stats, selectedModel }) => {
 
     setSearchTimeout(
       setTimeout(() => {
-        if (trimmedQuery === '') {
-          setSearchedResults(null);
-          return;
-        }
-
-        if (trimmedQuery === FALLBACK_PREVIEW_TRIGGER) {
-          setSearchedResults([FALLBACK_PREVIEW_POST]);
-          return;
-        }
-
-        const searchResult = (allPosts || []).filter((item) => {
-          const modelEntry = IMAGE_MODELS.find((m) => m.id === item.modelId);
-          const modelLabel = modelEntry?.label?.toLowerCase() || '';
-          return (
-            item.name.toLowerCase().includes(trimmedQuery) ||
-            item.prompt.toLowerCase().includes(trimmedQuery) ||
-            (item.modelId || '').toLowerCase().includes(trimmedQuery) ||
-            modelLabel.includes(trimmedQuery)
-          );
-        });
-
-        setSearchedResults(searchResult);
+        setSearchedResults(filterPosts(allPosts, trimmedQuery));
       }, 500)
     );
   };
@@ -146,6 +165,8 @@ const Home = ({ stats, selectedModel }) => {
               imageCount={stats.imageCount}
               userCount={stats.userCount}
               iconLogo={currentModel.iconLogo}
+              onRefresh={handleRefresh}
+              refreshing={refreshing}
             />
           </div>
         )}

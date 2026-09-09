@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { IMAGE_MODELS, DEFAULT_MODEL_ID } from './constants';
@@ -20,31 +20,32 @@ const App = () => {
 
   const currentModel = IMAGE_MODELS.find((m) => m.id === selectedModel) || IMAGE_MODELS[0];
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const prefetched = window.__PREFETCH_STATS__;
-        let result;
+  const fetchStats = useCallback(async () => {
+    try {
+      const prefetched = window.__PREFETCH_STATS__;
+      let result;
 
-        if (prefetched) {
-          window.__PREFETCH_STATS__ = null;
-          result = await prefetched;
-        }
-
-        if (!result) {
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/post/stats`);
-          if (!response.ok) return;
-          result = await response.json();
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        setStats(result.data);
-      } catch (err) {
-        console.error('Error fetching stats:', err.message);
+      if (prefetched) {
+        window.__PREFETCH_STATS__ = null;
+        result = await prefetched;
       }
-    };
-    fetchStats();
+
+      if (!result) {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/post/stats`);
+        if (!response.ok) return;
+        result = await response.json();
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      if (result?.data) setStats(result.data);
+    } catch (err) {
+      console.error('Error fetching stats:', err.message);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -120,7 +121,7 @@ const App = () => {
 
         <main id="main-content" className="sm:p-8 px-4 py-8 w-full min-h-[calc(100vh-73px)]">
           <Routes>
-            <Route path="/" element={<Home stats={stats} selectedModel={selectedModel} />} />
+            <Route path="/" element={<Home stats={stats} selectedModel={selectedModel} onRefreshStats={fetchStats} />} />
             <Route path="/create-post" element={<CreatePost onBusyChange={setBusy} selectedModel={selectedModel} onModelChange={setSelectedModel} />} />
           </Routes>
         </main>
