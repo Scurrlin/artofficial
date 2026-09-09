@@ -21,10 +21,10 @@ const StatCard = ({ imageCount, userCount, iconLogo, onRefresh, refreshing = fal
         disabled={refreshing}
         aria-label="Refresh feed"
         aria-busy={refreshing}
-        className="justify-self-center text-white p-0.5 rounded-md hover:opacity-80 transition-opacity disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+        className="justify-self-center text-white p-0.5 rounded-md disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
       >
         <svg
-          className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+          className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -33,8 +33,10 @@ const StatCard = ({ imageCount, userCount, iconLogo, onRefresh, refreshing = fal
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M21 12a9 9 0 1 1-3.2-6.86" />
-          <polyline points="21 3 21 9 15 9" />
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M8 16H3v5" />
         </svg>
       </button>
 
