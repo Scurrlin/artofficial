@@ -24,7 +24,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Utilize creative director controls for specific lighting, camera, and lens settings',
     textLogo: '/brand-logos/Google.svg',
     iconLogo: '/brand-logos/whiteG.svg',
-    statIconClass: 'w-9 h-9',
+    statIconClass: 'w-7 h-7',
   },
   {
     id: 'flux-2',
@@ -34,7 +34,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Use hex codes for colors, quotes for text, and JSON for complex scenes',
     textLogo: '/brand-logos/BFL.svg',
     iconLogo: '/brand-logos/black-forest-labs.svg',
-    statIconClass: 'w-11 h-11',
+    statIconClass: 'w-10 h-10',
   },
 ];
 
