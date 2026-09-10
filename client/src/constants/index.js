@@ -24,7 +24,7 @@ export const IMAGE_MODELS = [
     promptTip: 'Utilize creative director controls for specific lighting, camera, and lens settings',
     textLogo: '/brand-logos/Google.svg',
     iconLogo: '/brand-logos/whiteG.svg',
-    statIconClass: 'w-7 h-7',
+    statIconClass: 'w-8 h-8',
   },
   {
     id: 'flux-2',
