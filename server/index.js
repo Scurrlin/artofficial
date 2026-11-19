@@ -55,6 +55,17 @@ app.use(cors({
   credentials: true,
 }));
 
+const postLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many posts, please try again later.' },
+});
+
+// Runs before the JSON parser so rejected requests skip parsing a large body
+app.post('/api/v1/post', postLimiter);
+
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/v1/post', postRoutes);

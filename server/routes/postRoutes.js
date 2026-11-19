@@ -108,10 +108,10 @@ router.route('/').post(async (req, res) => {
       });
     }
 
-    if (trimmedPrompt.length > 1000) {
+    if (trimmedPrompt.length > 2000) {
       return res.status(400).json({
         success: false,
-        message: 'Prompt must be less than 1000 characters',
+        message: 'Prompt must be less than 2000 characters',
       });
     }
 

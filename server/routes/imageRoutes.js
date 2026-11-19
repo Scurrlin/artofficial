@@ -56,18 +56,26 @@ router.route('/').post(async (req, res) => {
       { upsert: true, new: true },
     );
 
+    const refundQuota = () => DailyLimit.updateOne(
+      { date: today },
+      { $inc: { total: -1, [`models.${model}`]: -1 } },
+    );
+
     if (result.total > 50) {
-      await DailyLimit.updateOne(
-        { date: today },
-        { $inc: { total: -1, [`models.${model}`]: -1 } },
-      );
+      await refundQuota();
       return res.status(429).json({
         success: false,
         message: 'Daily image limit reached (50/day). Please try again tomorrow!',
       });
     }
 
-    const { base64 } = await generateImage(trimmedPrompt, model, !!jsonMode);
+    let base64;
+    try {
+      ({ base64 } = await generateImage(trimmedPrompt, model, !!jsonMode));
+    } catch (error) {
+      await refundQuota().catch((refundError) => console.error('Quota refund failed:', refundError));
+      throw error;
+    }
 
     res.status(200).json({ photo: base64 });
 
