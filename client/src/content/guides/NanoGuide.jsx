@@ -4,7 +4,6 @@ import {
   GuideTab,
   GuideFrame,
   GuidePrompt,
-  GuideColumns,
   GuideAccordionGroup,
   GuideAccordion,
   GuideCallout,

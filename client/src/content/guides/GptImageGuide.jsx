@@ -1,12 +1,7 @@
 import React from 'react';
 import {
-  GuideTabs,
-  GuideTab,
   GuideFrame,
-  GuidePrompt,
   GuideColumns,
-  GuideAccordionGroup,
-  GuideAccordion,
   GuideCallout,
   GuideCodeBlock,
   GuideImage,

@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { IMAGE_MODELS, DEFAULT_MODEL_ID } from './constants';
 import Home from './pages/Home';
 import CreatePost from './pages/CreatePost';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -120,10 +121,12 @@ const App = () => {
         </header>
 
         <main id="main-content" className="sm:p-8 px-4 py-8 w-full min-h-[calc(100vh-73px)]">
-          <Routes>
-            <Route path="/" element={<Home stats={stats} selectedModel={selectedModel} onRefreshStats={fetchStats} />} />
-            <Route path="/create-post" element={<CreatePost onBusyChange={setBusy} selectedModel={selectedModel} onModelChange={setSelectedModel} />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Home stats={stats} selectedModel={selectedModel} onRefreshStats={fetchStats} />} />
+              <Route path="/create-post" element={<CreatePost onBusyChange={setBusy} selectedModel={selectedModel} onModelChange={setSelectedModel} />} />
+            </Routes>
+          </ErrorBoundary>
         </main>
       </div>
     </BrowserRouter>

@@ -2,6 +2,7 @@ import express from 'express';
 import * as dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 import Post from '../mongodb/models/post.js';
+import GeneratedImage, { hashImage } from '../mongodb/models/generatedImage.js';
 
 dotenv.config();
 
@@ -130,23 +131,41 @@ router.route('/').post(async (req, res) => {
       });
     }
 
-    const photoUrl = await cloudinary.uploader.upload(photo, {
-      eager: [
-        { width: 400, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
-        { width: 640, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
-        { width: 828, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
-        { width: 1080, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
-        { width: 1440, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
-      ],
-      eager_async: true,
-    });
+    // Only images this server generated can be shared, and each one only once
+    const imageHash = hashImage(photo.slice(photo.indexOf(',') + 1));
+    const generated = await GeneratedImage.findOneAndDelete({ hash: imageHash });
+    if (!generated) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only images generated on Art/official can be shared',
+      });
+    }
+    const restoreImage = () => GeneratedImage.create({ hash: imageHash })
+      .catch((restoreError) => console.error('Generated image restore failed:', restoreError));
 
-    const newPost = await Post.create({
-      name: trimmedName,
-      prompt: trimmedPrompt,
-      photo: photoUrl.secure_url,
-      modelId: model,
-    });
+    let newPost;
+    try {
+      const photoUrl = await cloudinary.uploader.upload(photo, {
+        eager: [
+          { width: 400, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
+          { width: 640, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
+          { width: 828, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
+          { width: 1080, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
+          { width: 1440, crop: 'fill', quality: 'auto:best', fetch_format: 'auto' },
+        ],
+        eager_async: true,
+      });
+
+      newPost = await Post.create({
+        name: trimmedName,
+        prompt: trimmedPrompt,
+        photo: photoUrl.secure_url,
+        modelId: model,
+      });
+    } catch (uploadError) {
+      await restoreImage();
+      throw uploadError;
+    }
 
     postsCache = { data: null, timestamp: 0 };
     statsCache = { data: null, timestamp: 0 };

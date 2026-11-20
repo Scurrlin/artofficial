@@ -1,5 +1,6 @@
 import express from 'express';
 import DailyLimit from '../mongodb/models/dailyLimit.js';
+import GeneratedImage, { hashImage } from '../mongodb/models/generatedImage.js';
 import { generateImage, isValidModel } from '../services/imageService.js';
 
 const router = express.Router();
@@ -76,6 +77,12 @@ router.route('/').post(async (req, res) => {
       await refundQuota().catch((refundError) => console.error('Quota refund failed:', refundError));
       throw error;
     }
+
+    await GeneratedImage.updateOne(
+      { hash: hashImage(base64) },
+      { $setOnInsert: { createdAt: new Date() } },
+      { upsert: true },
+    );
 
     res.status(200).json({ photo: base64 });
 
