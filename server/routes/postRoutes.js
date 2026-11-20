@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 import Post from '../mongodb/models/post.js';
 import GeneratedImage, { hashImage } from '../mongodb/models/generatedImage.js';
+import { isValidModel } from '../services/imageService.js';
 
 dotenv.config();
 
@@ -128,6 +129,13 @@ router.route('/').post(async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Photo must be a valid base64 image data URI',
+      });
+    }
+
+    if (!isValidModel(model)) {
+      return res.status(400).json({
+        success: false,
+        message: `Unsupported model: ${model}`,
       });
     }
 

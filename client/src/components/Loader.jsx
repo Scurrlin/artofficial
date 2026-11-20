@@ -1,7 +1,10 @@
 import React from 'react';
-import Lottie from 'lottie-react';
+import LottieModule from 'lottie-react';
 import darkAnimation from '../assets/darkLoader.json';
 import lightAnimation from '../assets/lightLoader.json';
+
+// Vite 8 returns the CJS module.exports object for default imports in "type": "module" projects.
+const Lottie = LottieModule.default ?? LottieModule;
 
 const animations = { dark: darkAnimation, light: lightAnimation };
 

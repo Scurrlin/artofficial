@@ -7,7 +7,8 @@ export function getRandomPrompt(prompt) {
 
 export async function downloadImage(_id, photo) {
     const { saveAs } = await import('file-saver');
-    saveAs(photo, `${_id}.jpg`);
+    const ext = photo.match(/\.(\w+)(?:\?|$)/)?.[1] || 'png';
+    saveAs(photo, `${_id}.${ext}`);
 }
 
 export function optimizedImageUrl(url, width = 1440) {

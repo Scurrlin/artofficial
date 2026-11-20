@@ -78,6 +78,18 @@ const imageLimiter = rateLimit({
   message: { success: false, message: 'Too many requests, please try again later.' },
 });
 
+// Per-visitor share of the global 50/day cap; failed generations don't count
+const dailyImageLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  max: 10,
+  skipFailedRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'You have reached your daily limit (10 images). Please try again tomorrow!' },
+});
+
+app.post('/api/v1/image', dailyImageLimiter);
+
 app.use('/api/v1/image', imageLimiter, imageRoutes);
 
 app.get('/', async (req, res) => {
