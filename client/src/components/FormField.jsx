@@ -1,5 +1,8 @@
 import React, { useMemo, useRef } from 'react';
-import Editor from 'react-simple-code-editor';
+import EditorModule from 'react-simple-code-editor';
+
+// Vite 8 returns the CJS module.exports object for default imports in "type": "module" projects.
+const Editor = EditorModule.default ?? EditorModule;
 
 function isValidJson(str) {
   const trimmed = str.trim();
