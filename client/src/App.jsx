@@ -72,7 +72,7 @@ const App = () => {
             style: {
               background: '#e06b6b',
               color: '#fff',
-              maxWidth: '90vw',
+              maxWidth: 'min(90vw, 420px)',
               wordBreak: 'break-word',
             },
             iconTheme: {

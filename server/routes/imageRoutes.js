@@ -5,6 +5,16 @@ import { generateImage, isValidModel } from '../services/imageService.js';
 
 const router = express.Router();
 
+// Provider errors can be long and technical (Gemini returns its full JSON body),
+// so the user gets a short message and the raw error stays in the server logs.
+const BLOCKED_PATTERN = /safety|moderation|flagged|sensitive|blocked|blocklist|prohibited|content.?polic|E005/i;
+
+const userFacingError = (error) => (
+  error?.code === 'moderation_blocked' || BLOCKED_PATTERN.test(error?.message || '')
+    ? 'This prompt was blocked by the image provider. Try rewording it.'
+    : 'Image generation failed. Please try again.'
+);
+
 router.route('/').get((req, res) => {
   res.status(200).json({ message: 'Hello from Artofficial Image API!' });
 });
@@ -88,8 +98,7 @@ router.route('/').post(async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    const errorMessage = error?.message || 'Something went wrong';
-    res.status(500).json({ success: false, message: errorMessage });
+    res.status(500).json({ success: false, message: userFacingError(error) });
   }
 });
 

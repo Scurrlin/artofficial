@@ -33,7 +33,8 @@ export async function generate(prompt) {
   const base64 = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
 
   if (!base64) {
-    throw new Error('Google Gemini returned no image data');
+    const reason = data.promptFeedback?.blockReason || data.candidates?.[0]?.finishReason || 'unknown';
+    throw new Error(`Google Gemini returned no image data (reason: ${reason})`);
   }
 
   return { base64 };
